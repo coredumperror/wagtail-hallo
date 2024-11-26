@@ -148,42 +148,32 @@
       },
       getSelection: function () {
         var range, sel;
-        sel = rangy.getSelection();
+        sel = document.getSelection();
         range = null;
         if (sel.rangeCount > 0) {
           range = sel.getRangeAt(0);
         } else {
-          range = rangy.createRange();
+          range = document.createRange();
         }
         return range;
       },
       restoreSelection: function (range) {
-        var sel;
-        sel = rangy.getSelection();
-        return sel.setSingleRange(range);
+        var sel = document.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
       },
       replaceSelection: function (cb) {
-        var newTextNode, r, range, sel, t;
-        if (navigator.appName === 'Microsoft Internet Explorer') {
-          t = document.selection.createRange().text;
-          r = document.selection.createRange();
-          return r.pasteHTML(cb(t));
-        } else {
-          sel = window.getSelection();
-          range = sel.getRangeAt(0);
-          newTextNode = document.createTextNode(cb(range.extractContents()));
-          range.insertNode(newTextNode);
-          range.setStartAfter(newTextNode);
-          sel.removeAllRanges();
-          return sel.addRange(range);
-        }
+        var newTextNode, range, sel;
+        sel = window.getSelection();
+        range = sel.getRangeAt(0);
+        newTextNode = document.createTextNode(cb(range.extractContents()));
+        range.insertNode(newTextNode);
+        range.setStartAfter(newTextNode);
+        sel.removeAllRanges();
+        sel.addRange(range);
       },
       removeAllSelections: function () {
-        if (navigator.appName === 'Microsoft Internet Explorer') {
-          return range.empty();
-        } else {
-          return window.getSelection().removeAllRanges();
-        }
+        return window.getSelection().removeAllRanges();
       },
       getPluginInstance: function (plugin) {
         var instance;
@@ -685,13 +675,6 @@
             if (el.hasClass('disabled')) {
               return;
             }
-            if (navigator.appName === 'Microsoft Internet Explorer') {
-              _this.options.editable.execute(
-                'FormatBlock',
-                '<' + tagName + '>',
-              );
-              return;
-            }
             return _this.options.editable.execute('formatBlock', tagName);
           });
           queryState = function (event) {
@@ -732,58 +715,6 @@
           cssClass: this.options.buttonCssClass,
         });
         return buttonElement;
-      },
-    });
-  })(jQuery);
-}.call(this));
-
-(function () {
-  (function (jQuery) {
-    var rangyMessage;
-    rangyMessage =
-      'The hallocleanhtml plugin requires the selection save and\
-        restore module from Rangy';
-    return jQuery.widget('IKS.hallocleanhtml', {
-      _create: function () {
-        var editor,
-          _this = this;
-        if (jQuery.htmlClean === void 0) {
-          throw new Error(
-            'The hallocleanhtml plugin requires jQuery.htmlClean',
-          );
-          return;
-        }
-        editor = this.element;
-        return editor.bind('paste', this, function (event) {
-          var lastContent, lastRange, widget;
-          if (rangy.saveSelection === void 0) {
-            throw new Error(rangyMessage);
-            return;
-          }
-          widget = event.data;
-          widget.options.editable.getSelection().deleteContents();
-          lastRange = rangy.saveSelection();
-          lastContent = editor.html();
-          editor.html('');
-          return setTimeout(function () {
-            var cleanPasted, error, pasted, range;
-            pasted = editor.html();
-            cleanPasted = jQuery.htmlClean(pasted, _this.options);
-            editor.html(lastContent);
-            rangy.restoreSelection(lastRange);
-            if (cleanPasted !== '') {
-              try {
-                return document.execCommand('insertHTML', false, cleanPasted);
-              } catch (_error) {
-                error = _error;
-                range = widget.options.editable.getSelection();
-                return range.insertNode(
-                  range.createContextualFragment(cleanPasted),
-                );
-              }
-            }
-          }, 4);
-        });
       },
     });
   })(jQuery);
@@ -854,7 +785,6 @@
           buttonset,
           command,
           format,
-          ie,
           widget,
           _i,
           _len,
@@ -862,8 +792,7 @@
           _this = this;
         widget = this;
         buttonset = jQuery('<span class="' + widget.widgetName + '"></span>');
-        ie = navigator.appName === 'Microsoft Internet Explorer';
-        command = ie ? 'FormatBlock' : 'formatBlock';
+        command = 'formatBlock';
         buttonize = function (format) {
           var buttonHolder;
           buttonHolder = jQuery('<span></span>');
@@ -3078,7 +3007,7 @@
       _getCaretPosition: function (range) {
         var newRange, position, tmpSpan;
         tmpSpan = jQuery('<span/>');
-        newRange = rangy.createRange();
+        newRange = document.createRange();
         newRange.setStart(range.endContainer, range.endOffset);
         newRange.insertNode(tmpSpan.get(0));
         position = {
@@ -3216,7 +3145,7 @@
       _getCaretPosition: function (range) {
         var newRange, position, tmpSpan;
         tmpSpan = jQuery('<span/>');
-        newRange = rangy.createRange();
+        newRange = document.createRange();
         newRange.setStart(range.endContainer, range.endOffset);
         newRange.insertNode(tmpSpan.get(0));
         position = {
@@ -3311,7 +3240,7 @@
       _getCaretPosition: function (range) {
         var newRange, position, tmpSpan;
         tmpSpan = jQuery('<span/>');
-        newRange = rangy.createRange();
+        newRange = document.createRange();
         newRange.setStart(range.endContainer, range.endOffset);
         newRange.insertNode(tmpSpan.get(0));
         position = {

@@ -8,6 +8,7 @@
     options: {
       uuid: '',
       editable: null,
+      imageChooser: null,
     },
     populateToolbar: function (toolbar) {
       var button;
@@ -32,10 +33,10 @@
           .parentsUntil('[data-hallo-editor]')
           .last();
         return ModalWorkflow({
-          url: window.chooserUrls.imageChooser + '?select_format=true',
+          url: widget.options.imageChooser + '?select_format=true',
           onload: IMAGE_CHOOSER_MODAL_ONLOAD_HANDLERS,
           responses: {
-            imageChosen: function (imageData) {
+            chosen: function (imageData) {
               var elem;
 
               elem = $(imageData.html).get(0);
