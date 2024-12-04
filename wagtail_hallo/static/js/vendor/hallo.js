@@ -800,26 +800,14 @@
             label: format,
             editable: _this.options.editable,
             command: command,
-            commandValue: ie ? '<' + format + '>' : format,
+            commandValue: format,
             uuid: _this.options.uuid,
             cssClass: _this.options.buttonCssClass,
             queryState: function (event) {
               var compared, e, map, result, val, value, _i, _len, _ref;
               try {
                 value = document.queryCommandValue(command);
-                if (ie) {
-                  map = {
-                    p: 'normal',
-                  };
-                  _ref = [1, 2, 3, 4, 5, 6];
-                  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                    val = _ref[_i];
-                    map['h' + val] = val;
-                  }
-                  compared = value.match(new RegExp(map[format], 'i'));
-                } else {
-                  compared = value.match(new RegExp(format, 'i'));
-                }
+                compared = value.match(new RegExp(format, 'i'));
                 result = compared ? true : false;
                 return buttonHolder.hallobutton('checked', result);
               } catch (_error) {
